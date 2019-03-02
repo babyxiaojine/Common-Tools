@@ -1,0 +1,180 @@
+
+@charset "utf-8";/* CSS Document*/
+
+$c1: #000;
+$c2: #E00E43;
+$c3: #261FE4;
+
+$t1:80px;
+$t2:40px;
+
+
+@mixin skewLight(){
+	position: relative; overflow: hidden;
+	&:after{content:""; position:absolute; left:-120%;top:0;width:100%;height:100%;background-image:-webkit-linear-gradient(0deg,hsla(0,0%,100%,0),hsla(0,0%,100%,.5),hsla(0,0%,100%,0));transform:skewx(-25deg);-webkit-transform:skewx(-25deg)}
+	&:hover:after{transition:all .5s ease;left:100%}
+}
+@mixin hoverScale(){
+	position: relative; overflow: hidden;
+	img,.img{display: block; @include trans;}
+	.img{display: block; width: 100%; height: 100%; @include bgcover;}
+	img{display: block; width: 100%;}
+	&:hover {
+		img,.img{@include scale;}
+	}
+}
+@mixin hc($c:$c2){
+	@include trans;
+	&:hover{color:$c;}
+}
+@mixin hoverDownShadow($w:90%,$h:10px,$y:10px){
+	position: relative; @include trans;
+	&:before{position: absolute; @include trans; width:$w; height: $h; left:(100% - $w)/2; top: 100%; opacity: 0; content:""; background:radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, transparent 80%);}
+	&:hover{@include translate($y:-$y);
+		&:before{@include translate($y:$y); opacity: 1;}
+	}
+}
+@mixin bgcover($size:cover){
+	background-size:$size; background-repeat: no-repeat; background-position: center center;
+}
+
+@mixin flexbox($jc:center,$ai:center,$ac:center,$fd:row,$fw:nowrap){
+	display: flex;
+	justify-content:$jc;
+	align-items:$ai;
+	align-content:$ac;
+	flex-direction:$fd;
+	flex-wrap:$fw;
+}
+@mixin filterGray($val:100%){
+	-webkit-filter: grayscale($val);
+	-moz-filter: grayscale($val);
+	-ms-filter: grayscale($val);
+	-o-filter: grayscale($val);
+	filter: grayscale($val);
+}
+@mixin shenglue{
+	overflow: hidden; text-overflow:ellipsis; white-space: nowrap;
+}
+@mixin trans($time:.3s){
+	transition:all $time; -webkit-transition:all $time;
+}
+// 多行省略号
+@mixin clamp($line:2){
+	overflow : hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: $line;
+	-webkit-box-orient: vertical;	
+}
+@mixin transform($transforms) {
+    -webkit-transform: $transforms;
+          transform: $transforms; 
+}
+@mixin translate ($x:0, $y:0) {
+   @include transform(translate($x, $y));
+}
+@mixin scale ($x:1.1) {
+   @include transform(scale($x));
+}
+@mixin skew ($deg:0) { 
+   @include transform(skew($deg));
+}
+@mixin rotate3d ($x:0,$y:0,$z:1,$ang:0) {
+   @include transform(rotate3d($x, $y, $z, $ang));
+}
+@mixin eventNone{
+	pointer-events:none;
+}
+@mixin eventAuto{
+	pointer-events:auto;
+} 
+@mixin hu(){
+	@include trans;
+	&:hover{text-decoration: underline;}
+}
+@mixin btner($w:120px,$h:32px,$bg:$c1,$fz:14px,$br:none,$cr:#fff,$hs:0){
+	display: inline-block; width: $w; height: $h;  border:$br; background: $bg; color:$cr; text-align: center; cursor: pointer; font-size: $fz; box-sizing:border-box;
+	@if $br == none {
+		line-height: $h;
+	}@else{
+		line-height: $h - 2px;
+	}
+	@include trans;
+
+	&:not(.disabled):not([disabled]):hover{
+		@if $hs == 1{
+			background:$c1;
+			color:#fff;  
+		}@else if $hs == 2{
+			background:$c2; 
+			color:#fff;  
+		} @else if $hs == 3{
+			@include scale; 
+		}
+
+	}
+	@if $hs == 4{
+		&{@include skewLight;}
+	}
+	@if $hs == 5{
+		&{position: relative; overflow: hidden;}
+		&:after{content:""; position: absolute; left: 0; border-radius:50%; background-color: rgba(0,0,0,.25); width: $w; height: $w; top: - ($w - $h)/2; opacity: 0;}
+		&:not(.disabled):not([disabled]):hover:after{
+			@include huaquan;
+		}
+	}
+
+}
+
+@mixin scaleout {
+	-webkit-animation: scaleout 18s infinite linear;
+	animation: scaleout 18s infinite linear;
+}
+@-webkit-keyframes scaleout {
+    0% { @include scale(1.2); opacity: .7;} 
+    50% { @include scale(1);}
+    100% { @include scale(1.2);}
+}
+@keyframes scaleout {
+    0% { @include scale(1.2); opacity: .7;} 
+    50% { @include scale(1);}
+    100% { @include scale(1.2); opacity: .7;}
+}
+@mixin huadong {
+	-webkit-animation: huadong 1.2s infinite linear;
+	animation: huadong 1.2s infinite linear;
+}
+@mixin shandong {
+	-webkit-animation: shandong 0.6s infinite linear;
+	animation: shandong 0.6s infinite linear;
+}
+@-webkit-keyframes huadong {
+    0% { @include translate($y:-60px); } 
+    100% { @include translate($y:0);}
+}
+@-webkit-keyframes shandong {
+    0% { @include scale(0.1); } 
+    100% { @include scale(1);}
+}
+
+
+
+@mixin ipt($w:100%,$h:50px,$bg:#fff,$fz:15px,$br:1px solid #ccc,$hs:0){
+	display: inline-block; width: $w; height: $h; line-height: $h; border:$br; background: $bg; color:#333;  font-size: $fz; box-sizing: border-box;
+	padding:0 10px;
+	@include trans;
+	&:focus{
+		border-color:#DB3738;
+	}
+	
+}
+@mixin ipt2($w:100%,$h:56px,$bg:none,$fz:14px,$bb:1px solid #111){
+	display: inline-block; width: $w; height: $h; line-height: $h; border:0; border-bottom:$bb; background: $bg; color:#333;  font-size: $fz; box-sizing: border-box;
+	
+	@include trans;
+	&:focus{
+		 background:#f0f0f0; padding:0 10px;
+	}
+	
+}

@@ -1,0 +1,16 @@
+{
+  "name": "dumps",
+  "version": "1.0.0",
+  "description": "sass-run-watch",
+  "main": "index.js",
+  "scripts": {
+    "start": "node-sass -w-r-o common.scss common.css --output-style compressed",
+    "test": "node-sass -w-r-o common.scss ../../public/home/css/common.css"
+  },
+  "dependencies": {},
+  "devDependencies": {
+  	"node-sass":""
+  },
+  "author": "",
+  "license": "ISC"
+}
