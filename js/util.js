@@ -157,3 +157,85 @@ function throttle(method, mustRunDelay) {
         }
     }
 }
+
+
+const validFormRules={
+  'required': /[\S]+/,
+  'mobile': /^[1][0-9]{10}$/,
+  'email':/^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/,
+  'telephone':/^([0-9]{3,4}-)?[0-9]{7,8}$/,
+  'amount': /^[0-9]{1,6}(\.\d{1,2})?$/,
+  'contactWay': function (str) {
+    return validFormRules.mobile.test(str) || validFormRules.email.test(str) || validFormRules.telephone.test(str);
+  }
+}
+/**
+ * 字符串转正则
+ * @param str-> 需要转换的字符串：*1-10 || n6-16
+ * @returns resReg-> 转换后的正则对象 /^[\w\W]{1,10}$/ || /^\d{6,16}$/
+ */
+function stringConvertRegexp(str){
+  let reg = /^(.+?)(\d+)-(\d+)$/;
+  let marr = str.match(reg);
+  if(marr){
+    const headings = {
+      's': '[\\u4E00-\\u9FA5\\uf900-\\ufa2d\\w\\.\\s]',
+      '*':'[\\w\\W]',
+      'n':'\\d',
+    }
+    if(marr[1] in headings){
+      let prefix = headings[marr[1]];
+      let allReg = '^'+prefix+'{'+marr[2]+','+marr[3]+'}$'
+      let resReg = new RegExp(allReg)
+      return resReg;
+    }
+  }
+  return false;
+  
+}
+/**
+ * 验证表单form对象
+ * @param formObj-> 需要验证的表单dom对象
+ * 需要验证的表单上需要加上规则属性rule，错误提示属性error不加这提示placeholder
+ * 示例 <input type="text" rule="mobile" error="请填写正确的手机号码" />
+ * @returns {status:true,msg:'请填写必填字段'}
+ */
+function validDomForm(formObj){
+    if(formObj == undefined){ 
+        return;
+    }
+    let status = true,msg = "验证通过";
+    for(var i=0; i<formObj.elements.length; i++){
+      let actEle = formObj.elements[i];
+      let rule = actEle.getAttribute('rule'),
+        tip = actEle.getAttribute('error') || actEle.getAttribute('placeholder') ;
+      let val = actEle.value.trim();
+      if(rule){
+        if(validFormRules[rule]){
+          const subRule = validFormRules[rule];
+          if(typeof subRule === 'function'){
+            if(!subRule(val)){
+              status = false;
+              msg = tip || '请填写必填字段';
+              break;
+            }
+          }else{
+            if(!subRule.test(val)){
+              status = false;
+              msg = tip || '请填写必填字段';
+              break;
+            }
+          }
+        }else{
+          const cusRule = stringConvertRegexp(rule);
+          if(cusRule && !cusRule.test(val)){
+              status = false;
+              msg = tip || '请填写必填字段';
+              break;
+          }
+        }
+
+      }
+    }
+    return {status:status, msg:msg}
+}
