@@ -15,6 +15,21 @@ function parseQueryString(url) {
     }
     return ret;
 }
+
+
+/** 格式化Object为url参数
+* @param obj[object]
+* @return [string]->a=1&b=2
+*/
+function encodeQueryString(obj){
+    var params = [];
+    for (var key in obj){
+        params.push(key + '=' + encodeURIComponent(obj[key]));
+    }
+    return params.join('&');
+}
+
+
 /** 图片base64转blob
 * @param dataurl -> 图片base64字符
 * @return Blob对象
@@ -59,18 +74,6 @@ function formatForm(form){
     console.log(arr[feled.name])
   }
   return arr
-}
-
-/** 格式化Object为url参数
-* @param obj[object]
-* @return [string]->a=1&b=2
-*/
-function objectToParams(obj){
-    var params = [];
-    for (var key in obj){
-        params.push(key + '=' + obj[key]);
-    }
-    return params.join('&');
 }
 
 /*
@@ -171,7 +174,7 @@ const validFormRules={
 }
 /**
  * 字符串转正则
- * @param str-> 需要转换的字符串：*1-10 || n6-16
+ * @param str-> 需要转换的字符串：*1-10  （任意字符位数6-16位） || n6-16 （数字位数6-16位） || int:r10-100 （数字10-100）
  * @returns resReg-> 转换后的正则对象 /^[\w\W]{1,10}$/ || /^\d{6,16}$/
  */
 function stringConvertRegexp(str){
@@ -188,6 +191,11 @@ function stringConvertRegexp(str){
       let allReg = '^'+prefix+'{'+marr[2]+','+marr[3]+'}$'
       let resReg = new RegExp(allReg)
       return resReg;
+    }
+    if(marr[1] === 'int:r'){
+      return function(v){
+        return /^\d$/.test(v) && v >= parseInt(marr[2]) && v <= parseInt(marr[3]);
+      }
     }
   }
   return false;
@@ -228,10 +236,12 @@ function validDomForm(formObj){
           }
         }else{
           const cusRule = stringConvertRegexp(rule);
-          if(cusRule && !cusRule.test(val)){
+          if(cusRule){
+            if((Object.prototype.toString.call(cusRule).indexOf('RegExp')>-1 && !cusRule.test(val)) || (Object.prototype.toString.call(cusRule).indexOf('Function')>-1 && !cusRule(val))){
               status = false;
               msg = tip || '请填写必填字段';
               break;
+            }
           }
         }
 
